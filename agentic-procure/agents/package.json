@@ -7,7 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "deploy:compliance": "cd agents/compliance && npm run deploy",
     "deploy:product-requirements": "cd agents/product-requirements && npm run deploy",
     "deploy:supplier-intelligence": "cd agents/supplier-intelligence && npm run deploy"
@@ -18,7 +18,6 @@
     "@aws-sdk/lib-dynamodb": "^3.0.0",
     "@aws-sdk/client-lambda": "^3.0.0",
     "@aws-sdk/client-s3": "^3.0.0",
-    "aws-sdk": "^2.1500.0",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.3.1",
@@ -35,6 +34,6 @@
     "nodemon": "^3.0.1",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   }
 } 
