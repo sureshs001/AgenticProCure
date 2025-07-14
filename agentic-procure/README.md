@@ -85,13 +85,19 @@ agentic-procure/
 3. **Set up environment variables**
    ```bash
    # Copy environment example files
-   cp backend/config/env.example backend/.env
+   cp backend/.env.example backend/.env
    cp frontend/.env.example frontend/.env
    
    # Edit the files with your AWS credentials and configuration
    ```
 
-4. **Start development servers**
+4. **Build all packages**
+   ```bash
+   # Build all packages (frontend, backend, agents, shared)
+   npm run build
+   ```
+
+5. **Start development servers**
    ```bash
    # Start both frontend and backend
    npm run dev
@@ -151,6 +157,34 @@ Agents are configured via the backend API and can be customized for:
 - System prompts
 - Tool integrations
 - Scheduling
+
+## 🔍 Troubleshooting
+
+### Build Issues
+
+If you encounter build errors:
+
+1. **TypeScript Errors**: Ensure all packages have proper `tsconfig.json` files
+2. **Module Resolution**: Clear node_modules and reinstall: `rm -rf node_modules package-lock.json && npm install`
+3. **Workspace Issues**: Build packages individually to isolate issues:
+   ```bash
+   cd shared && npm run build
+   cd ../backend && npm run build
+   cd ../frontend && npm run build
+   cd ../agents && npm run build
+   ```
+
+### Development Server Issues
+
+1. **Port Conflicts**: Change ports in environment files if 3000/3001 are in use
+2. **Memory Issues**: Increase Node.js memory limit: `export NODE_OPTIONS="--max-old-space-size=4096"`
+3. **AWS Credentials**: Verify AWS credentials are properly configured in `.env` files
+
+### Common Issues
+
+- **"Can't resolve './App'"**: Missing TypeScript configuration - ensure `tsconfig.json` exists in frontend
+- **Process is not defined**: Missing Node.js types - ensure proper TypeScript config in backend/agents
+- **AWS Bedrock Access**: Verify your AWS account has Bedrock model access enabled
 
 ## 📊 API Endpoints
 
