@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './RFPDashboard.css';
 
 const RFPDashboard: React.FC = () => {
@@ -70,7 +71,7 @@ const RFPDashboard: React.FC = () => {
         <div className="card">
           <div className="card-header">
             <h2>Recent RFPs</h2>
-            <button className="btn btn-primary">Create New RFP</button>
+            <Link to="/rfp/create" className="btn btn-primary">Create New RFP</Link>
           </div>
           <div className="rfp-list">
             {recentRFPs.map((rfp) => (
