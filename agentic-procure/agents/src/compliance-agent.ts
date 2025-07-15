@@ -1,22 +1,9 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { AgentConfig, AgentContext, AgentRequest, AgentResponse } from '@agentic-procure/shared';
+import { AgentConfig, AgentContext, AgentRequest, AgentResponse, services } from '@agentic-procure/shared';
 
 export class ComplianceAgent {
-  private bedrockClient: BedrockRuntimeClient;
-  private dynamoClient: DynamoDBDocumentClient;
   private config: AgentConfig;
 
   constructor() {
-    this.bedrockClient = new BedrockRuntimeClient({
-      region: process.env.AWS_REGION || 'us-east-1',
-    });
-
-    this.dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({
-      region: process.env.AWS_REGION || 'us-east-1',
-    }));
-
     this.config = {
       id: 'compliance-agent-001',
       name: 'Compliance Monitoring Agent',
@@ -42,36 +29,24 @@ export class ComplianceAgent {
     try {
       const prompt = this.buildPrompt(request);
       
-      const response = await this.bedrockClient.send(new InvokeModelCommand({
+      const response = await services.llm.invoke({
         modelId: this.config.model,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          anthropic_version: 'bedrock-2023-05-31',
-          max_tokens: this.config.maxTokens,
-          temperature: this.config.temperature,
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-        }),
-      }));
-
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-      const content = responseBody.content[0].text;
+        prompt,
+        temperature: this.config.temperature,
+        maxTokens: this.config.maxTokens,
+      });
 
       const agentResponse: AgentResponse = {
         id: `response-${Date.now()}`,
         agentType: 'compliance',
         query: request.query,
-        response: content,
-        confidence: this.calculateConfidence(content),
-        sources: this.extractSources(content),
+        response: response.content,
+        confidence: this.calculateConfidence(response.content),
+        sources: this.extractSources(response.content),
         timestamp: new Date().toISOString(),
       };
 
-      // Store the response in DynamoDB
+      // Store the response in the database
       await this.storeResponse(agentResponse);
 
       return agentResponse;
@@ -130,19 +105,16 @@ If this is a deadline monitoring request, provide specific dates and actions req
 
   private async storeResponse(response: AgentResponse): Promise<void> {
     try {
-      await this.dynamoClient.send(new PutCommand({
-        TableName: 'agentic-procure-responses',
-        Item: {
-          id: response.id,
-          agentType: response.agentType,
-          query: response.query,
-          response: response.response,
-          confidence: response.confidence,
-          sources: response.sources,
-          timestamp: response.timestamp,
-          ttl: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days TTL
-        },
-      }));
+      await services.database.put('agentic-procure-responses', {
+        id: response.id,
+        agentType: response.agentType,
+        query: response.query,
+        response: response.response,
+        confidence: response.confidence,
+        sources: response.sources,
+        timestamp: response.timestamp,
+        ttl: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days TTL
+      });
     } catch (error) {
       console.error('Error storing agent response:', error);
     }
@@ -150,17 +122,16 @@ If this is a deadline monitoring request, provide specific dates and actions req
 
   async getChatHistory(agentType: string, limit: number = 20, offset: number = 0): Promise<AgentResponse[]> {
     try {
-      const result = await this.dynamoClient.send(new QueryCommand({
-        TableName: 'agentic-procure-responses',
-        KeyConditionExpression: 'agentType = :agentType',
-        ExpressionAttributeValues: {
+      const result = await services.database.query('agentic-procure-responses', {
+        keyConditionExpression: 'agentType = :agentType',
+        expressionAttributeValues: {
           ':agentType': agentType,
         },
-        ScanIndexForward: false, // Most recent first
-        Limit: limit,
-      }));
+        scanIndexForward: false, // Most recent first
+        limit,
+      });
 
-      return (result.Items || []) as AgentResponse[];
+      return result.items as AgentResponse[];
     } catch (error) {
       console.error('Error retrieving chat history:', error);
       return [];
