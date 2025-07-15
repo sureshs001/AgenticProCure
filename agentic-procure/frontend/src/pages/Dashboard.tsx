@@ -1,5 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { 
+  BuildingIcon, 
+  FileTextIcon, 
+  ShieldIcon, 
+  ClipboardListIcon,
+  RobotIcon,
+  UploadIcon,
+  AlertTriangleIcon,
+  CheckCircleIcon,
+  TrendingUpIcon,
+  ArrowRightIcon
+} from '../components/Icons';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -8,33 +20,37 @@ const Dashboard: React.FC = () => {
       title: 'Total Suppliers',
       value: '45',
       change: '+3',
-      changeType: 'positive',
-      icon: '🏢',
+      changeType: 'positive' as const,
+      icon: BuildingIcon,
       link: '/compliance',
+      description: 'Active vendor relationships',
     },
     {
       title: 'Active RFPs',
       value: '3',
       change: '+1',
-      changeType: 'positive',
-      icon: '📝',
+      changeType: 'positive' as const,
+      icon: FileTextIcon,
       link: '/rfp',
+      description: 'In progress procurement',
     },
     {
       title: 'Compliance Score',
       value: '92%',
       change: '+2%',
-      changeType: 'positive',
-      icon: '🛡️',
+      changeType: 'positive' as const,
+      icon: ShieldIcon,
       link: '/compliance',
+      description: 'Overall compliance rating',
     },
     {
-      title: 'Product Requirements',
+      title: 'Requirements',
       value: '12',
       change: '+2',
-      changeType: 'positive',
-      icon: '📋',
+      changeType: 'positive' as const,
+      icon: ClipboardListIcon,
       link: '/product-requirements',
+      description: 'Product specifications',
     },
   ];
 
@@ -42,84 +58,175 @@ const Dashboard: React.FC = () => {
     {
       id: 1,
       type: 'alert',
-      message: 'High compliance risk detected for PharmaCorp Solutions',
+      icon: AlertTriangleIcon,
+      title: 'High Compliance Risk Detected',
+      message: 'PharmaCorp Solutions has a compliance risk score of 75% for ISO 13485',
       time: '2 hours ago',
-      severity: 'high',
+      severity: 'high' as const,
+      category: 'Compliance',
     },
     {
       id: 2,
       type: 'rfp',
-      message: 'New RFP created for Medical Device Software',
+      icon: FileTextIcon,
+      title: 'New RFP Created',
+      message: 'Medical Device Software RFP has been initiated with 5 suppliers',
       time: '4 hours ago',
-      severity: 'medium',
+      severity: 'medium' as const,
+      category: 'RFP',
     },
     {
       id: 3,
       type: 'supplier',
-      message: 'PackagingPro Ltd updated compliance documentation',
+      icon: CheckCircleIcon,
+      title: 'Compliance Documentation Updated',
+      message: 'PackagingPro Ltd successfully updated their ISO 13485 certification',
       time: '1 day ago',
-      severity: 'low',
+      severity: 'low' as const,
+      category: 'Supplier',
+    },
+  ];
+
+  const quickActions = [
+    {
+      title: 'Chat with AI Assistant',
+      description: 'Get instant help with procurement queries',
+      icon: RobotIcon,
+      link: '/chat',
+      variant: 'primary' as const,
+    },
+    {
+      title: 'Upload Requirements',
+      description: 'Add new product specifications',
+      icon: UploadIcon,
+      link: '/product-requirements',
+      variant: 'secondary' as const,
+    },
+    {
+      title: 'Create New RFP',
+      description: 'Start a new procurement process',
+      icon: FileTextIcon,
+      link: '/rfp/create',
+      variant: 'secondary' as const,
+    },
+    {
+      title: 'Review Compliance',
+      description: 'Check supplier compliance status',
+      icon: ShieldIcon,
+      link: '/compliance',
+      variant: 'secondary' as const,
     },
   ];
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome back, Procurement Manager</h1>
-        <p>Here's what's happening with your procurement activities today.</p>
+        <div className="welcome-section">
+          <h1 className="welcome-title">Welcome back, Sarah</h1>
+          <p className="welcome-subtitle">
+            Here's what's happening with your procurement activities today.
+          </p>
+        </div>
+        <div className="header-actions">
+          <Link to="/chat" className="btn btn-primary">
+            <RobotIcon size={18} />
+            Ask AI Assistant
+          </Link>
+        </div>
       </div>
 
-      <div className="stats-grid">
-        {stats.map((stat, index) => (
-          <Link key={index} to={stat.link} className="stat-card">
-            <div className="stat-icon">{stat.icon}</div>
-            <div className="stat-content">
-              <h3 className="stat-title">{stat.title}</h3>
-              <div className="stat-value">{stat.value}</div>
-              <div className={`stat-change ${stat.changeType}`}>
-                {stat.change}
-              </div>
-            </div>
-          </Link>
-        ))}
+      <div className="stats-section">
+        <div className="stats-grid">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <Link key={index} to={stat.link} className="stat-card">
+                <div className="stat-card-content">
+                  <div className="stat-header">
+                    <div className="stat-icon-wrapper">
+                      <IconComponent className="stat-icon" size={24} />
+                    </div>
+                    <div className="stat-trend">
+                      <TrendingUpIcon size={16} />
+                    </div>
+                  </div>
+                  <div className="stat-body">
+                    <div className="stat-value">{stat.value}</div>
+                    <h3 className="stat-title">{stat.title}</h3>
+                    <p className="stat-description">{stat.description}</p>
+                  </div>
+                  <div className="stat-footer">
+                    <div className={`stat-change ${stat.changeType}`}>
+                      {stat.change} from last month
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <div className="dashboard-content">
         <div className="content-grid">
-          <div className="card">
-            <h2>Recent Activities</h2>
-            <div className="activity-list">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className={`activity-item ${activity.severity}`}>
-                  <div className="activity-icon">
-                    {activity.type === 'alert' && '⚠️'}
-                    {activity.type === 'rfp' && '📝'}
-                    {activity.type === 'supplier' && '🏢'}
-                  </div>
-                  <div className="activity-content">
-                    <p className="activity-message">{activity.message}</p>
-                    <span className="activity-time">{activity.time}</span>
-                  </div>
-                </div>
-              ))}
+          <div className="activities-section">
+            <div className="section-header">
+              <h2 className="section-title">Recent Activities</h2>
+              <Link to="/compliance" className="section-action">
+                View All
+                <ArrowRightIcon size={16} />
+              </Link>
+            </div>
+            <div className="card">
+              <div className="activity-list">
+                {recentActivities.map((activity) => {
+                  const IconComponent = activity.icon;
+                  return (
+                    <div key={activity.id} className={`activity-item severity-${activity.severity}`}>
+                      <div className="activity-icon">
+                        <IconComponent size={20} />
+                      </div>
+                      <div className="activity-content">
+                        <div className="activity-header">
+                          <h4 className="activity-title">{activity.title}</h4>
+                          <span className={`activity-category category-${activity.severity}`}>
+                            {activity.category}
+                          </span>
+                        </div>
+                        <p className="activity-message">{activity.message}</p>
+                        <span className="activity-time">{activity.time}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="card">
-            <h2>Quick Actions</h2>
+          <div className="actions-section">
+            <div className="section-header">
+              <h2 className="section-title">Quick Actions</h2>
+            </div>
             <div className="quick-actions">
-              <Link to="/chat" className="btn btn-primary">
-                🤖 Chat with AI Agent
-              </Link>
-              <Link to="/product-requirements" className="btn btn-secondary">
-                📋 Upload Requirements
-              </Link>
-              <Link to="/rfp" className="btn btn-secondary">
-                📝 Create New RFP
-              </Link>
-              <Link to="/compliance" className="btn btn-secondary">
-                🛡️ Check Compliance
-              </Link>
+              {quickActions.map((action, index) => {
+                const IconComponent = action.icon;
+                return (
+                  <Link
+                    key={index}
+                    to={action.link}
+                    className={`action-card btn-${action.variant}`}
+                  >
+                    <div className="action-icon">
+                      <IconComponent size={20} />
+                    </div>
+                    <div className="action-content">
+                      <h3 className="action-title">{action.title}</h3>
+                      <p className="action-description">{action.description}</p>
+                    </div>
+                    <ArrowRightIcon className="action-arrow" size={16} />
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
