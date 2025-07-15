@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import ComplianceDashboard from './pages/ComplianceDashboard';
 import ProductRequirements from './pages/ProductRequirements';
 import RFPDashboard from './pages/RFPDashboard';
+import RFPCreation from './pages/RFPCreation';
 import AgentChat from './pages/AgentChat';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/compliance" element={<ComplianceDashboard />} />
             <Route path="/product-requirements" element={<ProductRequirements />} />
             <Route path="/rfp" element={<RFPDashboard />} />
+            <Route path="/rfp/create" element={<RFPCreation />} />
             <Route path="/chat" element={<AgentChat />} />
           </Routes>
         </Layout>

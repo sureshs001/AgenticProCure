@@ -26,7 +26,8 @@ export const authMiddleware = (
 
     // For MVP, we'll use a simple validation
     // In production, validate against a database or AWS Cognito
-    if (apiKey !== process.env.API_KEY) {
+    const validApiKey = process.env.API_KEY || 'agentic-procure-dev-key-123';
+    if (apiKey !== validApiKey) {
       throw createError('Invalid API key', 401);
     }
 
